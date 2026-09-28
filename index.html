@@ -1,0 +1,751 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Guitar Practice V5.1</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  </head>
+
+  <body>
+    <header class="app-header">
+      <div class="header-content">
+        <div>
+          <h1>🎸 Guitar Practice</h1>
+          <p>Entrenamiento y seguimiento de guitarra</p>
+        </div>
+
+        <div class="header-actions">
+          <button id="exportBtn" class="btn btn-secondary">📤 Exportar</button>
+
+          <button id="importBtn" class="btn btn-secondary">📥 Importar</button>
+
+          <input type="file" id="importFile" accept=".json" hidden />
+        </div>
+      </div>
+    </header>
+
+    <nav class="main-nav">
+      <button class="nav-btn active" data-section="dashboard">
+        📊 Dashboard
+      </button>
+
+      <button class="nav-btn" data-section="practice">🎸 Practicar</button>
+
+      <button class="nav-btn" data-section="exercises">📚 Ejercicios</button>
+
+      <button class="nav-btn" data-section="routines">📋 Rutinas</button>
+
+      <button class="nav-btn" data-section="history">🕘 Historial</button>
+    </nav>
+
+    <main class="container">
+      <!-- ================================================= -->
+      <!-- DASHBOARD -->
+      <!-- ================================================= -->
+
+      <section id="dashboard" class="app-section active">
+        <div class="section-heading">
+          <div>
+            <h2>📊 Dashboard</h2>
+            <p>Resumen de tu práctica de guitarra</p>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-icon">⏱️</span>
+            <span class="stat-label">Tiempo total</span>
+            <strong id="totalTime">0m</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon">🎸</span>
+            <span class="stat-label">Sesiones</span>
+            <strong id="totalSessions">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon">📅</span>
+            <span class="stat-label">Hoy</span>
+            <strong id="todayTime">0m</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon">📆</span>
+            <span class="stat-label">Esta semana</span>
+            <strong id="weekTime">0m</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon">📚</span>
+            <span class="stat-label">Ejercicios</span>
+            <strong id="exerciseCount">0</strong>
+          </div>
+
+          <div class="stat-card">
+            <span class="stat-icon">🔥</span>
+            <span class="stat-label">Racha actual</span>
+            <strong id="currentStreak">0 días</strong>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>🎯 Objetivo diario</h3>
+                <p>Tiempo que quieres practicar cada día.</p>
+              </div>
+            </div>
+
+            <div class="daily-goal">
+              <div class="goal-circle" id="goalCircle">
+                <span id="goalPercentage">0%</span>
+              </div>
+
+              <div class="goal-info">
+                <strong id="goalTimeText"> 0 / 30 min </strong>
+
+                <label>
+                  Objetivo diario
+                  <input
+                    type="number"
+                    id="dailyGoal"
+                    min="1"
+                    max="600"
+                    value="30"
+                  />
+                  minutos
+                </label>
+
+                <button id="saveGoalBtn" class="btn btn-primary">
+                  Guardar objetivo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>🔥 Actividad reciente</h3>
+                <p>Tus últimos días de práctica.</p>
+              </div>
+            </div>
+
+            <div id="recentActivity" class="recent-activity">
+              <p class="empty-message">Todavía no hay actividad registrada.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>📚 Tus ejercicios</h3>
+              <p>Resumen de la biblioteca.</p>
+            </div>
+
+            <button class="btn btn-primary" data-go-section="exercises">
+              + Ver ejercicios
+            </button>
+          </div>
+
+          <div id="dashboardExercises" class="mini-exercises"></div>
+        </div>
+      </section>
+
+      <!-- ================================================= -->
+      <!-- PRACTICE -->
+      <!-- ================================================= -->
+
+      <section id="practice" class="app-section">
+        <div class="section-heading">
+          <div>
+            <h2>🎸 Practicar</h2>
+            <p>Entrena y registra tu sesión.</p>
+          </div>
+        </div>
+
+        <!-- METRONOME -->
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>🎵 Metrónomo</h3>
+              <p>Controla el tempo de tu práctica.</p>
+            </div>
+
+            <span id="metronomeStatus" class="status-badge"> Detenido </span>
+          </div>
+
+          <div class="metronome">
+            <div class="bpm-control">
+              <button id="bpmMinus" class="round-btn">−</button>
+
+              <div class="bpm-display">
+                <strong id="bpmValue">80</strong>
+                <span>BPM</span>
+              </div>
+
+              <button id="bpmPlus" class="round-btn">+</button>
+            </div>
+
+            <button id="tapTempoBtn" class="btn btn-secondary">
+              👆 Tap Tempo
+            </button>
+
+            <div class="form-group">
+              <label for="subdivision"> Subdivisión </label>
+
+              <select id="subdivision">
+                <option value="1">1 — Negras</option>
+
+                <option value="2">2 — Corcheas</option>
+
+                <option value="4">4 — Semicorcheas</option>
+              </select>
+            </div>
+
+            <div id="beatIndicator" class="beat-indicator">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <div class="metronome-buttons">
+              <button id="metronomeStart" class="btn btn-primary">
+                ▶ Iniciar
+              </button>
+
+              <button id="metronomeStop" class="btn btn-danger">
+                ■ Detener
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRACTICE SESSION -->
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>⏱️ Sesión de práctica</h3>
+              <p>Registra lo que estás practicando.</p>
+            </div>
+
+            <span id="timerStatus" class="status-badge"> Sin iniciar </span>
+          </div>
+
+          <div class="timer-display" id="timer">00:00:00</div>
+
+          <div class="practice-form">
+            <div class="form-group">
+              <label for="exercise"> Ejercicio </label>
+
+              <select id="exercise">
+                <option value="">Selecciona un ejercicio</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="bpm"> BPM </label>
+
+              <input type="number" id="bpm" min="20" max="300" value="80" />
+            </div>
+
+            <div class="form-group">
+              <label for="notes"> Notas </label>
+
+              <textarea
+                id="notes"
+                rows="3"
+                placeholder="¿Cómo te fue?"
+              ></textarea>
+            </div>
+
+            <label class="checkbox-label">
+              <input type="checkbox" id="useMetronomeBpm" />
+
+              Usar BPM del metrónomo
+            </label>
+
+            <div class="practice-buttons">
+              <button id="startBtn" class="btn btn-primary btn-large">
+                ▶ Iniciar sesión
+              </button>
+
+              <button id="pauseBtn" class="btn btn-warning btn-large" disabled>
+                ⏸ Pausar
+              </button>
+
+              <button
+                id="changeExerciseBtn"
+                class="btn btn-secondary btn-large"
+                disabled
+              >
+                🔄 Cambiar ejercicio
+              </button>
+
+              <button id="finishBtn" class="btn btn-danger btn-large" disabled>
+                ■ Finalizar
+              </button>
+            </div>
+          </div>
+
+          <div class="current-exercise">
+            <h3 id="currentExerciseTitle">Sin ejercicio</h3>
+
+            <div class="current-exercise-stats">
+              <div>
+                <span>Tiempo</span>
+                <strong id="currentSegmentTime"> 00:00 </strong>
+              </div>
+
+              <div>
+                <span>BPM</span>
+                <strong id="currentSegmentBpm"> — </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ROUTINE RUNNER -->
+
+        <div id="routineRunner" class="card hidden">
+          <div class="card-header">
+            <div>
+              <h3>📋 Rutina activa</h3>
+              <p id="activeRoutineName">—</p>
+            </div>
+
+            <button id="stopRoutineBtn" class="btn btn-danger">
+              Detener rutina
+            </button>
+          </div>
+
+          <div id="routineProgress"></div>
+        </div>
+      </section>
+
+      <!-- ================================================= -->
+      <!-- EXERCISES -->
+      <!-- ================================================= -->
+
+      <section id="exercises" class="app-section">
+        <div class="section-heading">
+          <div>
+            <h2>📚 Biblioteca de ejercicios</h2>
+            <p>Organiza todo lo que quieres estudiar.</p>
+          </div>
+
+          <button id="newExerciseBtn" class="btn btn-primary">
+            + Nuevo ejercicio
+          </button>
+        </div>
+
+        <div class="filters-card card">
+          <div class="form-group">
+            <label for="exerciseSearch"> Buscar </label>
+
+            <input
+              type="search"
+              id="exerciseSearch"
+              placeholder="Buscar ejercicio..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="exerciseCategoryFilter"> Categoría </label>
+
+            <select id="exerciseCategoryFilter">
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <label class="checkbox-label">
+            <input type="checkbox" id="favoriteFilter" />
+
+            ⭐ Solo favoritos
+          </label>
+        </div>
+
+        <div id="exerciseList" class="exercise-grid"></div>
+
+        <div id="emptyExercises" class="empty-state hidden">
+          <span>📚</span>
+          <h3>No hay ejercicios</h3>
+          <p>Crea tu primer ejercicio para comenzar.</p>
+
+          <button class="btn btn-primary" id="emptyNewExerciseBtn">
+            Crear ejercicio
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================= -->
+      <!-- ROUTINES -->
+      <!-- ================================================= -->
+
+      <section id="routines" class="app-section">
+        <div class="section-heading">
+          <div>
+            <h2>📋 Rutinas</h2>
+            <p>Crea sesiones estructuradas de entrenamiento.</p>
+          </div>
+
+          <button id="newRoutineBtn" class="btn btn-primary">
+            + Nueva rutina
+          </button>
+        </div>
+
+        <div id="routineList" class="routine-grid"></div>
+
+        <div id="emptyRoutines" class="empty-state">
+          <span>📋</span>
+
+          <h3>No hay rutinas</h3>
+
+          <p>Crea una rutina para organizar tus sesiones.</p>
+
+          <button class="btn btn-primary" id="emptyNewRoutineBtn">
+            Crear rutina
+          </button>
+        </div>
+      </section>
+
+      <!-- ================================================= -->
+      <!-- HISTORY -->
+      <!-- ================================================= -->
+
+      <section id="history" class="app-section">
+        <div class="section-heading">
+          <div>
+            <h2>🕘 Historial</h2>
+            <p>Todas tus sesiones registradas.</p>
+          </div>
+
+          <button id="clearHistoryBtn" class="btn btn-danger">
+            🗑️ Limpiar historial
+          </button>
+        </div>
+
+        <div class="card history-card">
+          <div id="emptyHistory" class="empty-state">
+            <span>🕘</span>
+
+            <h3>No hay sesiones</h3>
+
+            <p>Tus sesiones aparecerán aquí.</p>
+          </div>
+
+          <div id="sessionTableContainer" class="table-wrapper hidden">
+            <table>
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Duración</th>
+                  <th>Ejercicios</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+
+              <tbody id="sessionTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================================================= -->
+    <!-- EXERCISE MODAL -->
+    <!-- ================================================= -->
+
+    <div id="exerciseModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="exerciseModalTitle">Nuevo ejercicio</h2>
+
+          <button id="closeExerciseModal" class="modal-close">×</button>
+        </div>
+
+        <form id="exerciseForm">
+          <input type="hidden" id="exerciseId" />
+
+          <div class="form-group">
+            <label for="exerciseName"> Nombre * </label>
+
+            <input
+              type="text"
+              id="exerciseName"
+              required
+              placeholder="Ej. Alternate Picking"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="exerciseCategory"> Categoría </label>
+
+              <select id="exerciseCategory">
+                <option value="Técnica">Técnica</option>
+
+                <option value="Escalas">Escalas</option>
+
+                <option value="Acordes">Acordes</option>
+
+                <option value="Ritmo">Ritmo</option>
+
+                <option value="Improvisación">Improvisación</option>
+
+                <option value="Teoría">Teoría</option>
+
+                <option value="Canciones">Canciones</option>
+
+                <option value="Otros">Otros</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="exerciseDifficulty"> Dificultad </label>
+
+              <select id="exerciseDifficulty">
+                <option value="Fácil">Fácil</option>
+
+                <option value="Medio" selected>Medio</option>
+
+                <option value="Difícil">Difícil</option>
+
+                <option value="Experto">Experto</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="exerciseStartBpm"> BPM inicial </label>
+
+              <input
+                type="number"
+                id="exerciseStartBpm"
+                min="20"
+                max="300"
+                value="60"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="exerciseTargetBpm"> BPM objetivo </label>
+
+              <input
+                type="number"
+                id="exerciseTargetBpm"
+                min="20"
+                max="300"
+                value="120"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="exerciseNotes"> Notas </label>
+
+            <textarea
+              id="exerciseNotes"
+              rows="4"
+              placeholder="Descripción, técnica, observaciones..."
+            ></textarea>
+          </div>
+
+          <label class="checkbox-label">
+            <input type="checkbox" id="exerciseFavorite" />
+
+            ⭐ Marcar como favorito
+          </label>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              id="cancelExerciseBtn"
+              class="btn btn-secondary"
+            >
+              Cancelar
+            </button>
+
+            <button type="submit" class="btn btn-primary">
+              Guardar ejercicio
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- ROUTINE MODAL -->
+    <!-- ================================================= -->
+
+    <div id="routineModal" class="modal hidden">
+      <div class="modal-content large-modal">
+        <div class="modal-header">
+          <h2 id="routineModalTitle">Nueva rutina</h2>
+
+          <button id="closeRoutineModal" class="modal-close">×</button>
+        </div>
+
+        <form id="routineForm">
+          <input type="hidden" id="routineId" />
+
+          <div class="form-group">
+            <label for="routineName"> Nombre de la rutina * </label>
+
+            <input
+              type="text"
+              id="routineName"
+              required
+              placeholder="Ej. Rutina diaria de técnica"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="routineDescription"> Descripción </label>
+
+            <textarea
+              id="routineDescription"
+              rows="3"
+              placeholder="Objetivo de esta rutina..."
+            ></textarea>
+          </div>
+
+          <div class="routine-builder-header">
+            <h3>Ejercicios de la rutina</h3>
+
+            <button
+              type="button"
+              id="addRoutineExerciseBtn"
+              class="btn btn-secondary"
+            >
+              + Añadir ejercicio
+            </button>
+          </div>
+
+          <div id="routineExercises" class="routine-exercise-builder"></div>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              id="cancelRoutineBtn"
+              class="btn btn-secondary"
+            >
+              Cancelar
+            </button>
+
+            <button type="submit" class="btn btn-primary">
+              Guardar rutina
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- CHANGE EXERCISE MODAL -->
+    <!-- ================================================= -->
+
+    <div id="changeExerciseModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🔄 Cambiar ejercicio</h2>
+
+          <button id="closeChangeExerciseModal" class="modal-close">×</button>
+        </div>
+
+        <div class="form-group">
+          <label for="nextExercise"> Nuevo ejercicio </label>
+
+          <select id="nextExercise"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="nextBpm"> BPM </label>
+
+          <input type="number" id="nextBpm" min="20" max="300" value="80" />
+        </div>
+
+        <div class="form-group">
+          <label for="nextNotes"> Notas </label>
+
+          <textarea id="nextNotes" rows="3"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button id="cancelChangeExerciseBtn" class="btn btn-secondary">
+            Cancelar
+          </button>
+
+          <button id="confirmChangeExerciseBtn" class="btn btn-primary">
+            Cambiar ejercicio
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- IMPORT MODAL -->
+    <!-- ================================================= -->
+
+    <div id="importModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📥 Importar datos</h2>
+
+          <button id="closeImportModal" class="modal-close">×</button>
+        </div>
+
+        <p>¿Cómo quieres importar los datos?</p>
+
+        <div class="import-options">
+          <button id="mergeImportBtn" class="import-option">
+            <strong>➕ Combinar</strong>
+
+            <span>
+              Conserva tus datos actuales y añade los datos del archivo.
+            </span>
+          </button>
+
+          <button id="replaceImportBtn" class="import-option">
+            <strong>🔄 Reemplazar</strong>
+
+            <span>
+              Sustituye los datos actuales por los datos del archivo.
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================================================= -->
+    <!-- NOTIFICATION -->
+    <!-- ================================================= -->
+
+    <div id="notification" class="notification"></div>
+
+    <script src="app.js"></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("./service-worker.js")
+            .then(() => console.log("PWA: Service Worker registrado"))
+            .catch(error => console.error("PWA: Error registrando Service Worker", error));
+        });
+      }
+    </script>
+  </body>
+</html>
