@@ -21,6 +21,15 @@
         </div>
 
         <div class="header-actions">
+          <button
+            id="themeToggleBtn"
+            class="btn btn-secondary"
+            type="button"
+            aria-label="Cambiar modo de color"
+          >
+            🌙 Oscuro
+          </button>
+
           <button id="exportBtn" class="btn btn-secondary">📤 Exportar</button>
 
           <button id="importBtn" class="btn btn-secondary">📥 Importar</button>
@@ -741,9 +750,12 @@
     <script>
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
-          navigator.serviceWorker.register("./service-worker.js")
+          navigator.serviceWorker
+            .register("./service-worker.js")
             .then(() => console.log("PWA: Service Worker registrado"))
-            .catch(error => console.error("PWA: Error registrando Service Worker", error));
+            .catch((error) =>
+              console.error("PWA: Error registrando Service Worker", error),
+            );
         });
       }
     </script>

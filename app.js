@@ -2,6 +2,112 @@
    GUITAR PRACTICE V5.1
    ========================================================= */
 
+/* =========================================================
+   THEME — V5.1.1
+   ========================================================= */
+
+const THEME_STORAGE_KEY = "guitarPracticeTheme";
+
+function applyTheme(theme) {
+  const dark = theme === "dark";
+  document.body.classList.toggle("dark-mode", dark);
+
+  const button = $("themeToggleBtn");
+
+  if (button) {
+    button.textContent = dark ? "☀️ Claro" : "🌙 Oscuro";
+    button.setAttribute(
+      "aria-label",
+      dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro",
+    );
+    button.title = dark ? "Cambiar a modo claro" : "Cambiar a modo oscuro";
+  }
+
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+  if (metaTheme) {
+    metaTheme.setAttribute("content", dark ? "#111827" : "#2563eb");
+  }
+}
+
+function initTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+
+  if (savedTheme === "dark" || savedTheme === "light") {
+    applyTheme(savedTheme);
+    return;
+  }
+
+  const prefersDark =
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+  applyTheme(prefersDark ? "dark" : "light");
+}
+
+function toggleTheme() {
+  const nextTheme = document.body.classList.contains("dark-mode")
+    ? "light"
+    : "dark";
+
+  localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  applyTheme(nextTheme);
+}
+
+/* =========================================================
+   SCREEN WAKE LOCK — V5.1.2
+   ========================================================= */
+
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if (!("wakeLock" in navigator)) {
+    return false;
+  }
+
+  if (wakeLock && !wakeLock.released) {
+    return true;
+  }
+
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+
+    wakeLock.addEventListener("release", () => {
+      wakeLock = null;
+    });
+
+    return true;
+  } catch (error) {
+    wakeLock = null;
+    console.warn("No se pudo mantener la pantalla activa:", error);
+    return false;
+  }
+}
+
+async function releaseWakeLock() {
+  if (!wakeLock) {
+    return;
+  }
+
+  try {
+    await wakeLock.release();
+  } catch (error) {
+    console.warn("No se pudo liberar Wake Lock:", error);
+  }
+
+  wakeLock = null;
+}
+
+async function refreshWakeLock() {
+  if (document.visibilityState !== "visible") {
+    return;
+  }
+
+  if (sessionRunning || metronomeRunning) {
+    await requestWakeLock();
+  }
+}
+
 const STORAGE_KEYS = {
   sessions: "guitarSessions",
   exercises: "guitarExercises",
@@ -1326,6 +1432,8 @@ function startSession() {
 
   sessionPaused = false;
 
+  requestWakeLock();
+
   segmentStartSeconds = elapsedSeconds;
 
   timerInterval = setInterval(updateTimer, 1000);
@@ -1358,6 +1466,8 @@ function pauseSession() {
 
   if (sessionPaused) {
     sessionPaused = false;
+
+    requestWakeLock();
 
     timerInterval = setInterval(updateTimer, 1000);
 
@@ -2083,7 +2193,7 @@ function playClick(isAccent = false) {
     context.currentTime,
   );
 
-  const volume = isAccent ? 0.16 : 0.1;
+  const volume = isAccent ? 0.8 : 0.5;
 
   const now = context.currentTime;
 
@@ -2143,6 +2253,8 @@ function startMetronome() {
 
   getAudioContext();
 
+  requestWakeLock();
+
   metronomeRunning = true;
 
   currentBeat = 0;
@@ -2168,6 +2280,10 @@ function stopMetronome() {
   });
 
   $("metronomeStatus").textContent = "Detenido";
+
+  if (!sessionRunning) {
+    releaseWakeLock();
+  }
 }
 
 function restartMetronomeIfRunning() {
@@ -2463,11 +2579,18 @@ function finishImport() {
   renderDashboard();
 }
 
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    refreshWakeLock();
+  }
+});
+
 /* =========================================================
    EVENT LISTENERS
    ========================================================= */
 
 function setupEvents() {
+  $("themeToggleBtn").addEventListener("click", toggleTheme);
   /* Navigation */
 
   document.querySelectorAll(".nav-btn").forEach((button) => {
@@ -2713,6 +2836,8 @@ function setupEvents() {
    ========================================================= */
 
 function init() {
+  initTheme();
+
   createDefaultExercises();
 
   setupEvents();

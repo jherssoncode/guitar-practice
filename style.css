@@ -1243,7 +1243,6 @@ th {
   .main-nav {
     justify-content: flex-start;
   }
-  
 }
 
 @media (max-width: 800px) {
@@ -1330,4 +1329,134 @@ th {
   .practice-buttons .btn {
     width: 100%;
   }
+}
+
+/* =========================================================
+   DARK MODE — V5.1.1
+   ========================================================= */
+
+body.dark-mode {
+  --bg: #111827;
+  --surface: #1f2937;
+  --surface-soft: #273449;
+  --text: #f3f4f6;
+  --muted: #aeb8c7;
+  --border: #374151;
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+}
+
+body.dark-mode .app-header,
+body.dark-mode .main-nav,
+body.dark-mode .card,
+body.dark-mode .stat-card,
+body.dark-mode .exercise-card,
+body.dark-mode .routine-card {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+body.dark-mode .nav-btn:hover {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+body.dark-mode .nav-btn.active {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+body.dark-mode .btn-secondary,
+body.dark-mode .round-btn,
+body.dark-mode .status-badge,
+body.dark-mode .tag {
+  background: #374151;
+  color: var(--text);
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: #111827;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #7f8da3;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+}
+
+body.dark-mode .goal-circle::after {
+  background: var(--surface);
+}
+
+body.dark-mode .activity-bar,
+body.dark-mode .progress-bar {
+  background: #374151;
+}
+
+body.dark-mode .current-exercise,
+body.dark-mode .mini-exercise,
+body.dark-mode .routine-item {
+  background: var(--surface-soft);
+  border-color: var(--border);
+}
+
+body.dark-mode .beat-indicator span {
+  background: #4b5563;
+}
+
+body.dark-mode .beat-indicator span.active {
+  background: var(--primary);
+}
+
+body.dark-mode .beat-indicator span.accent {
+  background: var(--danger);
+}
+
+body.dark-mode .exercise-card.favorite {
+  border-color: #d97706;
+}
+
+body.dark-mode .remove-routine-row {
+  background: #451a1a;
+  color: #fca5a5;
+}
+
+body.dark-mode th {
+  background: #273449;
+}
+
+body.dark-mode .modal-content {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.dark-mode .modal-close {
+  color: var(--muted);
+}
+
+body.dark-mode .notification {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .empty-state {
+  color: var(--muted);
+}
+
+body.dark-mode a {
+  color: #93c5fd;
 }
